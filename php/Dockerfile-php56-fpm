@@ -1,0 +1,33 @@
+FROM php:5.6.30-fpm-alpine
+
+MAINTAINER Rai Siqueira <contato@raisiqueira.com>
+
+ENV PHP_INI_DIR /etc/php5/php.ini
+
+RUN apk add --update --no-cache \
+	php5-pdo \
+    php5-pdo_mysql \
+    php5-mysql \
+    php5-mysqli \
+    php5-mcrypt \
+    php5-ctype \
+    php5-zlib \
+    php5-gd \
+    php5-exif \
+    php5-intl \
+    php5-memcache \
+    php5-sqlite3 \
+    php5-pgsql \
+    php5-xml \
+    php5-xsl \
+    php5-curl \
+    php5-openssl \
+    php5-iconv \
+    php5-json \
+    php5-phar \
+    php5-soap \
+    php5-dom \
+    php5-zip
+
+RUN sed -i "/post_max_size = .*/c\post_max_size = 1000M" /etc/php5/php.ini && \
+    sed -i "/upload_max_filesize = .*/c\upload_max_filesize = 1000M" /etc/php5/php.ini

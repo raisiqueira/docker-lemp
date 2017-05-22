@@ -1,44 +1,40 @@
-version: "2"
+version: "3"
 
 services:
     nginx:
-        image: nginx
+        image: nginx:1.11.13-alpine
         ports:
             - "${SERVER_PORT}:80"
-        links:
-            - phpfpm:phpfpm
+        depends_on:
+            - phpfpm
+            - db
         volumes:
             - ./server/logs/:/var/log/nginx/
             - ./server/app.conf:/etc/nginx/conf.d/default.conf
             - ./app:/app
 
     phpfpm:
-        image: php:fpm
+        #image: php:${PHP_IMAGE}
+        build:
+            context: ./php
+            dockerfile: Dockerfile-php56-fpm
         ports:
             - "9000:9000"
         volumes:
             - ./app:/app
 
     db:
-        image: mysql
+        image: mysql/mysql-server:5.7
         ports:
             - '${MYSQL_PORT}:3306'
         volumes:
-            - ./db-data:/var/lib/mysql
+            - db-data:/var/lib/mysql
         environment:
             MYSQL_USER: "${MYSQL_USER}"
             MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
             MYSQL_DATABASE: "${MYSQL_DATABASE}"
             MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
 
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        ports:
-            - "${PHPMYADMIN_PORT}:80"
-        links:
-            - db:db
-        environment:
-            MYSQL_USER: "${MYSQL_USER}"
-            MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-            MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-            PMA_HOST: db
+volumes:
+    db-data:
+        driver: local
